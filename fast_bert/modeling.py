@@ -294,7 +294,7 @@ class AlbertForMultiLabelSequenceClassification(AlbertForSequenceClassification)
         position_ids=None,
         head_mask=None,
     ):
-        outputs = self.roberta(
+        outputs = self.albert(
             input_ids,
             position_ids=position_ids,
             token_type_ids=token_type_ids,
