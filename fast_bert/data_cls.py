@@ -228,24 +228,28 @@ class TextProcessor(DataProcessor):
 
         if size == -1:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
-
+            print("train:", data_df.head(5))
             return self._create_examples(data_df, "train", text_col=text_col, label_col=label_col)
         else:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
 #             data_df['comment_text'] = data_df['comment_text'].apply(cleanHtml)
+            print("train:", data_df.head(5))
             return self._create_examples(data_df.sample(size), "train", text_col=text_col, label_col=label_col)
 
     def get_dev_examples(self, filename='val.csv', text_col='text', label_col='label', size=-1):
 
         if size == -1:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
+            print("dev:", data_df.head(5))
             return self._create_examples(data_df, "dev", text_col=text_col, label_col=label_col)
         else:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
+            print("dev:", data_df.head(5))
             return self._create_examples(data_df.sample(size), "dev", text_col=text_col, label_col=label_col)
 
     def get_test_examples(self, filename='val.csv', text_col='text', label_col='label', size=-1):
         data_df = pd.read_csv(os.path.join(self.data_dir, filename))
+        print("test:", data_df.head(5))
 #         data_df['comment_text'] = data_df['comment_text'].apply(cleanHtml)
         if size == -1:
             return self._create_examples(data_df, "test",  text_col=text_col, label_col=None)
