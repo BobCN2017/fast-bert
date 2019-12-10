@@ -220,9 +220,9 @@ class DataProcessor(object):
 
 
 def print_df(data_df, number):
+    number=number*10
     for index, row in data_df.iterrows():
-        print(row)
-        if index == number: break
+        if index % number==0: print(row)
 
 
 class TextProcessor(DataProcessor):
