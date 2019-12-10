@@ -310,7 +310,7 @@ class AlbertForMultiLabelSequenceClassification(AlbertForSequenceClassification)
             loss_fct = BCEWithLogitsLoss()
 
             loss = loss_fct(
-                logits.view(-1, self.num_labels), labels.view(-1)
+                logits.view(-1, self.num_labels), labels.view(-1, self.num_labels)
             )
             outputs = (loss,) + outputs
 
