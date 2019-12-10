@@ -173,9 +173,9 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
         else:
             input_ids = input_ids + ([pad_token] * padding_length)
             input_mask = input_mask + \
-                ([0 if mask_padding_with_zero else 1] * padding_length)
+                         ([0 if mask_padding_with_zero else 1] * padding_length)
             segment_ids = segment_ids + \
-                ([pad_token_segment_id] * padding_length)
+                          ([pad_token_segment_id] * padding_length)
 
         assert len(input_ids) == max_seq_length
         assert len(input_mask) == max_seq_length
@@ -219,6 +219,12 @@ class DataProcessor(object):
         raise NotImplementedError()
 
 
+def print_df(data_df, number):
+    for index, row in data_df.iterrows():
+        print(row)
+        if index == number: break
+
+
 class TextProcessor(DataProcessor):
 
     def __init__(self, data_dir, label_dir):
@@ -230,31 +236,36 @@ class TextProcessor(DataProcessor):
 
         if size == -1:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
-            print("train:", json.dumps(data_df.head(5)))
+            print("train:")
+            print_df(data_df, 5)
             return self._create_examples(data_df, "train", text_col=text_col, label_col=label_col)
         else:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
-#             data_df['comment_text'] = data_df['comment_text'].apply(cleanHtml)
-            print("train:", json.dumps(data_df.head(5)))
+            #             data_df['comment_text'] = data_df['comment_text'].apply(cleanHtml)
+            print("train:")
+            print_df(data_df, 5)
             return self._create_examples(data_df.sample(size), "train", text_col=text_col, label_col=label_col)
 
     def get_dev_examples(self, filename='val.csv', text_col='text', label_col='label', size=-1):
 
         if size == -1:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
-            print("dev:", json.dumps(data_df.head(5)))
+            print("dev:")
+            print_df(data_df, 5)
             return self._create_examples(data_df, "dev", text_col=text_col, label_col=label_col)
         else:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
-            print("dev:",json.dumps(data_df.head(5)))
+            print("dev:")
+            print_df(data_df, 5)
             return self._create_examples(data_df.sample(size), "dev", text_col=text_col, label_col=label_col)
 
     def get_test_examples(self, filename='val.csv', text_col='text', label_col='label', size=-1):
         data_df = pd.read_csv(os.path.join(self.data_dir, filename))
-        print("test:", json.dumps(data_df.head(5)))
-#         data_df['comment_text'] = data_df['comment_text'].apply(cleanHtml)
+        print("test:")
+        print_df(data_df, 5)
+        #         data_df['comment_text'] = data_df['comment_text'].apply(cleanHtml)
         if size == -1:
-            return self._create_examples(data_df, "test",  text_col=text_col, label_col=None)
+            return self._create_examples(data_df, "test", text_col=text_col, label_col=None)
         else:
             return self._create_examples(data_df.sample(size), "test", text_col=text_col, label_col=None)
 
@@ -270,7 +281,9 @@ class TextProcessor(DataProcessor):
         if label_col == None:
             return list(df.apply(lambda row: InputExample(guid=row.index, text_a=row[text_col], label=None), axis=1))
         else:
-            return list(df.apply(lambda row: InputExample(guid=row.index, text_a=row[text_col], label=str(row[label_col])), axis=1))
+            return list(
+                df.apply(lambda row: InputExample(guid=row.index, text_a=row[text_col], label=str(row[label_col])),
+                         axis=1))
 
 
 class MultiLabelTextProcessor(TextProcessor):
@@ -298,7 +311,8 @@ class BertDataBunch(object):
 
     def __init__(self, data_dir, label_dir, tokenizer, train_file='train.csv', val_file='val.csv', test_data=None,
                  label_file='labels.csv', text_col='text', label_col='label', batch_size_per_gpu=16, max_seq_length=512,
-                 multi_gpu=True, multi_label=False, backend="nccl", model_type='bert', logger=None, clear_cache=False, no_cache=False):
+                 multi_gpu=True, multi_label=False, backend="nccl", model_type='bert', logger=None, clear_cache=False,
+                 no_cache=False):
 
         # just in case someone passes string instead of Path
         if isinstance(data_dir, str):
@@ -318,7 +332,7 @@ class BertDataBunch(object):
         self.train_file = train_file
         self.val_file = val_file
         self.test_data = test_data
-        self.cache_dir = data_dir/'cache'
+        self.cache_dir = data_dir / 'cache'
         self.max_seq_length = max_seq_length
         self.batch_size_per_gpu = batch_size_per_gpu
         self.train_dl = None
@@ -363,7 +377,7 @@ class BertDataBunch(object):
                 train_examples, 'train', no_cache=self.no_cache)
 
             self.train_batch_size = self.batch_size_per_gpu * \
-                max(1, self.n_gpu)
+                                    max(1, self.n_gpu)
             train_sampler = RandomSampler(train_dataset)
             self.train_dl = DataLoader(
                 train_dataset, sampler=train_sampler, batch_size=self.train_batch_size)
@@ -376,7 +390,7 @@ class BertDataBunch(object):
                 'dev',
                 'multi_label' if self.multi_label else 'multi_class',
                 str(self.max_seq_length),
-                os.path.basename(val_file))) 
+                os.path.basename(val_file)))
 
             if os.path.exists(cached_features_file) == False:
                 val_examples = processor.get_dev_examples(
@@ -386,7 +400,7 @@ class BertDataBunch(object):
 
             # no grads necessary, hence double val batch size
             self.val_batch_size = self.batch_size_per_gpu * \
-                2 * max(1, self.n_gpu)
+                                  2 * max(1, self.n_gpu)
             val_sampler = SequentialSampler(val_dataset)
             self.val_dl = DataLoader(
                 val_dataset, sampler=val_sampler, batch_size=self.val_batch_size)
@@ -430,9 +444,9 @@ class BertDataBunch(object):
         return DataLoader(test_dataset, sampler=test_sampler, batch_size=self.batch_size_per_gpu)
 
     def save(self, filename="databunch.pkl"):
-        tmp_path = self.data_dir/'tmp'
+        tmp_path = self.data_dir / 'tmp'
         tmp_path.mkdir(exist_ok=True)
-        with open(str(tmp_path/filename), "wb") as f:
+        with open(str(tmp_path / filename), "wb") as f:
             pickle.dump(self, f)
 
     def get_dataset_from_examples(self, examples, set_type='train', is_test=False, no_cache=False):
@@ -442,8 +456,8 @@ class BertDataBunch(object):
         elif set_type == 'dev':
             file_name = self.val_file
         elif set_type == 'test':
-            file_name = 'test' # test is not supposed to be a file - just a list of texts
-        
+            file_name = 'test'  # test is not supposed to be a file - just a list of texts
+
         cached_features_file = os.path.join(self.cache_dir, 'cached_{}_{}_{}_{}_{}'.format(
             self.model_type,
             set_type,
