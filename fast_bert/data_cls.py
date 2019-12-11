@@ -373,7 +373,7 @@ class BertDataBunch(object):
             if os.path.exists(cached_features_file) == False or self.no_cache == True:
                 train_examples = processor.get_train_examples(
                     train_file, text_col=text_col, label_col=label_col)
-            print(len(train_examples))
+
             train_dataset = self.get_dataset_from_examples(
                 train_examples, 'train', no_cache=self.no_cache)
 
