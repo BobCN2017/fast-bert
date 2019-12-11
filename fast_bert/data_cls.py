@@ -225,6 +225,7 @@ def print_df(data_df, number):
     #     if index % number==0: print(row)
     pass
 
+
 class TextProcessor(DataProcessor):
 
     def __init__(self, data_dir, label_dir):
@@ -233,16 +234,16 @@ class TextProcessor(DataProcessor):
         self.labels = None
 
     def get_train_examples(self, filename='train.csv', text_col='text', label_col='label', size=-1):
-
+        print("train size:", size)
         if size == -1:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
-            print("train:")
+            print("train:", data_df.__len__())
             print_df(data_df, 5)
             return self._create_examples(data_df, "train", text_col=text_col, label_col=label_col)
         else:
             data_df = pd.read_csv(os.path.join(self.data_dir, filename))
             #             data_df['comment_text'] = data_df['comment_text'].apply(cleanHtml)
-            print("train:")
+            print("train:", data_df.__len__())
             print_df(data_df, 5)
             return self._create_examples(data_df.sample(size), "train", text_col=text_col, label_col=label_col)
 
@@ -372,7 +373,7 @@ class BertDataBunch(object):
             if os.path.exists(cached_features_file) == False or self.no_cache == True:
                 train_examples = processor.get_train_examples(
                     train_file, text_col=text_col, label_col=label_col)
-
+            print(len(train_examples))
             train_dataset = self.get_dataset_from_examples(
                 train_examples, 'train', no_cache=self.no_cache)
 
