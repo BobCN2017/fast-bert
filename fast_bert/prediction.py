@@ -1,3 +1,4 @@
+import logging
 import os
 import torch
 from transformers import BertTokenizer
@@ -136,7 +137,7 @@ class BertClassificationPredictor(object):
             self.model_path,
             metrics=[],
             device=device,
-            logger=None,
+            logger=logging.getLogger(),
             output_dir=None,
             warmup_steps=0,
             multi_gpu=False,
